@@ -1,0 +1,340 @@
+{
+  "lastID": 28,
+  "questions": [
+    {
+      "name": "Question 1",
+      "text": "What is the capital of France?",
+      "answers": [
+        {
+          "id": 0,
+          "text": "Paris",
+          "points": 10,
+          "correct": true,
+          "percentage": 100
+        },
+        {
+          "id": 1,
+          "text": "London",
+          "points": 0,
+          "correct": false,
+          "percentage": 100
+        },
+        {
+          "id": 2,
+          "text": "Berlin",
+          "points": 0,
+          "correct": false,
+          "percentage": 50
+        }
+      ]
+    },
+    {
+      "name": "Question 2",
+      "text": "What is the largest planet in our solar system?",
+      "answers": [
+        {
+          "id": 3,
+          "text": "Jupiter",
+          "points": 10,
+          "correct": true,
+          "percentage": 100
+        },
+        {
+          "id": 4,
+          "text": "Mars",
+          "points": 0,
+          "correct": false,
+          "percentage": 100
+        },
+        {
+          "id": 5,
+          "text": "Earth",
+          "points": 0,
+          "correct": false,
+          "percentage": 100
+        }
+      ]
+    },
+    {
+      "name": "Testing Question",
+      "text": "Some nice question text...",
+      "answers": [
+        {
+          "id": 6,
+          "text": "It is 42",
+          "points": 1,
+          "correct": true,
+          "percentage": 100
+        },
+        {
+          "id": 7,
+          "text": "Berlin",
+          "points": 0,
+          "correct": false,
+          "percentage": 75
+        },
+        {
+          "id": 8,
+          "text": "Earth",
+          "points": 0,
+          "correct": false,
+          "percentage": 50
+        }
+      ]
+    },
+    {
+      "name": "capital",
+      "text": "capital of name",
+      "answers": [
+        {
+          "id": 9,
+          "text": "yaounde",
+          "points": 30,
+          "correct": true,
+          "percentage": 100
+        },
+        {
+          "id": 10,
+          "text": "doula",
+          "points": 0,
+          "correct": false,
+          "percentage": 0
+        },
+        {
+          "id": 11,
+          "text": "bafoussam",
+          "points": 0,
+          "correct": false,
+          "percentage": 0
+        }
+      ]
+    },
+    {
+      "name": "ques 35",
+      "text": "was ist gesmacktlos?",
+      "answers": [
+        {
+          "id": 12,
+          "text": "weed",
+          "points": 0,
+          "correct": false,
+          "percentage": 0
+        },
+        {
+          "id": 13,
+          "text": "wasser",
+          "points": 9,
+          "correct": true,
+          "percentage": 100
+        },
+        {
+          "id": 14,
+          "text": "Mango",
+          "points": 0,
+          "correct": false,
+          "percentage": 0
+        }
+      ]
+    },
+    {
+      "name": "Question 23",
+      "text": "ist Gillian klug?",
+      "answers": [
+        {
+          "id": 15,
+          "text": "ja",
+          "points": 0,
+          "correct": false,
+          "percentage": 100
+        },
+        {
+          "id": 16,
+          "text": "nein",
+          "points": 0,
+          "correct": false,
+          "percentage": 7
+        },
+        {
+          "id": 17,
+          "text": "villeicht",
+          "points": 23,
+          "correct": true,
+          "percentage": 100
+        }
+      ]
+    },
+    {
+      "name": "frucht",
+      "text": "habe ich es geschaft?",
+      "answers": [
+        {
+          "id": 18,
+          "text": "ich glaube ja",
+          "points": 12,
+          "correct": false,
+          "percentage": 100
+        },
+        {
+          "id": 19,
+          "text": "es kann sein",
+          "points": 2,
+          "correct": true,
+          "percentage": -2
+        },
+        {
+          "id": 21,
+          "text": "a",
+          "points": 8,
+          "correct": true,
+          "percentage": -8
+        }
+      ]
+    },
+    {
+      "name": "reality",
+      "text": "is it real?",
+      "answers": [
+        {
+          "id": 22,
+          "text": " know",
+          "points": 2,
+          "correct": true,
+          "percentage": -3
+        },
+        {
+          "id": 23,
+          "text": "don't know",
+          "points": 2,
+          "correct": true,
+          "percentage": -3
+        },
+        {
+          "id": 24,
+          "text": "maybe",
+          "points": 2,
+          "correct": false,
+          "percentage": -3
+        }
+      ]
+    },
+    {
+      "name": "hgsfdhga",
+      "text": "sdggfg",
+      "answers": [
+        {
+          "id": 25,
+          "text": "Berlin",
+          "points": 8,
+          "correct": false,
+          "percentage": 80
+        }
+      ]
+    },
+    {
+      "name": "question 0",
+      "text": "bist du zufrieden?",
+      "answers": [
+        {
+          "id": 26,
+          "text": "nein",
+          "points": 10,
+          "correct": false,
+          "percentage": 100
+        }
+      ]
+    },
+    {
+      "name": "newQ",
+      "text": "what a Q",
+      "answers": [
+        {
+          "id": 27,
+          "text": "23",
+          "points": -2,
+          "correct": false,
+          "percentage": 2
+        },
+        {
+          "id": 28,
+          "text": "33",
+          "points": 4,
+          "correct": false,
+          "percentage": -2
+        }
+      ]
+    },
+    {
+      "name": "reality",
+      "text": "is it real?",
+      "answers": [
+        {
+          "id": 22,
+          "text": " know",
+          "points": 2,
+          "correct": true,
+          "percentage": -3
+        },
+        {
+          "id": 23,
+          "text": "don't know",
+          "points": 2,
+          "correct": true,
+          "percentage": -3
+        },
+        {
+          "id": 24,
+          "text": "maybe",
+          "points": 2,
+          "correct": false,
+          "percentage": -3
+        }
+      ]
+    },
+    {
+      "name": "hgsfdhga",
+      "text": "sdggfg",
+      "answers": [
+        {
+          "id": 25,
+          "text": "Berlin",
+          "points": 8,
+          "correct": false,
+          "percentage": 80
+        }
+      ]
+    },
+    {
+      "name": "question 0",
+      "text": "bist du zufrieden?",
+      "answers": [
+        {
+          "id": 26,
+          "text": "nein",
+          "points": 10,
+          "correct": false,
+          "percentage": 100
+        }
+      ]
+    },
+    {
+      "name": "newQ",
+      "text": "what a Q",
+      "answers": [
+        {
+          "id": 27,
+          "text": "23",
+          "points": -2,
+          "correct": false,
+          "percentage": 2
+        },
+        {
+          "id": 28,
+          "text": "33",
+          "points": 4,
+          "correct": false,
+          "percentage": -2
+        }
+      ]
+    }
+  ]
+}
