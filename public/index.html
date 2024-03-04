@@ -6,6 +6,7 @@
         <title>Visualisation</title>
         <link rel="stylesheet" type="text/css" href="layout.css">
         <script src="https://unpkg.com/gojs/release/go.js" defer></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
        
     </head>
     <body>
@@ -71,8 +72,8 @@
                         <td><button type="button" id="addAnswerBtn">Add Answer</button></td>
                           <td colspan="2"><button type="button" id="cancelAnswerBtn">Cancel Answer</button></td>
                           
-                        <td><button type="submit">Add Question</button></td>
-                        <td><button onclick="closeContainer('newQuestion')">cancel</button></td>
+                        <td><button id="submitQuestion" type="submit">Add Question</button></td>
+                        <td><button id="cancelQuestion" onclick="closeContainer('newQuestion')">cancel</button></td>
                       </tr>
                     </table>
                   </form>
