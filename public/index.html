@@ -1,100 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Visualisation</title>
-        <link rel="stylesheet" type="text/css" href="layout.css">
-        <script src="https://unpkg.com/gojs/release/go.js" defer></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-       
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Visualisation</title>
+      <link rel="stylesheet" type="text/css" href="layout.css">
+      <script src="https://unpkg.com/gojs/release/go.js" defer></script>
+      <script src="conf.js"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
+      <header>
+          <div id="pageTitle">
+              <h1 style="margin-left: 10px;">Quiz</h1>
+          </div>
+          <div class="search-container">
+              <input type="text" id="searchInput" placeholder="Search a question..." title="search a question">
+              <!-- Hier wird die Autovervollständigungsliste eingefügt -->
+              <div class="autoCompleteContainer">
+                <ul id="autoCompleteList"></ul>
+              </div>
+          </div>
+          <div class="menuItem">
+              <span id="updateQuiz" onclick="updateData()" onmouseover="mousseOnMemuItem(this)" onmouseout="mousseOutOfMemuItem(this)" title="save all changes on questions and answers" >save changes</span>
+              <span  id= "AddQuestion" onclick="openContainer('newQuestion')" onmouseover="mousseOnMemuItem(this)" onmouseout="mousseOutOfMemuItem(this)" title="Add a new Question">Add Question</span>
+              <span id=" CreateExam" onclick="openContainer('newExam')" onmouseover="mousseOnMemuItem(this)"  onmouseout="mousseOutOfMemuItem(this)" title="create an exam">Create Exam</span> 
+          </div>
+      </header>
+      <div class="container">
 
-        <header>
-            <div id="pageTitle">
-                <h1 style="margin-left: 10px;">Quiz</h1>
-            </div>
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Suche..." title="search a question">
-                <!-- Hier wird die Autovervollständigungsliste eingefügt -->
-                <div class="autoCompleteContainer">
-                  <ul id="autoCompleteList"></ul>
-                </div>
-            </div>
-            <div class="menuItem">
-                <span id="updateQuiz" onclick="updateData()" onmouseover="mousseOnMemuItem(this)" onmouseout="mousseOutOfMemuItem(this)" title="save all changes on questions and answers" >save changes</span>
-                <span  id= "AddQuestion" onclick="openContainer('newQuestion')" onmouseover="mousseOnMemuItem(this)" onmouseout="mousseOutOfMemuItem(this)" title="Add a new Question">Add Question</span>
-                <span id=" CreateExam" onclick="openContainer('newExam')" onmouseover="mousseOnMemuItem(this)"  onmouseout="mousseOutOfMemuItem(this)" title="create an exam">Create Exam</span> 
-            </div>
-        </header>
-        <div class="container">
-
-            <div id="main-content">
-              
-                <!-- Hauptinhalt, standardmäßig auf volle Breite --> 
-                <div id="quiz-container" style="width:100%; height:100%;"></div>
-                
-
-              <dialog id="dialog">
-
-                <h2>the questions have been successfully updated </h2>
-          
-              </dialog>
-                
-            </div>
-    
-            <div id="newQuestion" class="newContainer">
-                <!-- Inhalt für new Question -->
-                <h1 style="text-align: center;">Add new Question</h1>
-                <div id="newQuestion" style="width: 100%; justify-content: center; margin: 20px;">
-                  <form id="dataForm">
-                    <table>
-                      <tr>
-                        <td><label for="questionName">Question Name:</label></td>
-                        <td><input type="text" id="questionName" name="questionName" required></td>
-                      </tr>
-                      <tr>
-                        <td><label for="questionText">Question Text:</label></td>
-                        <td><input type="text" id="questionText" name="questionText" required></td>
-                      </tr>
-                      <tr>
-                        <!-- Hier sollte <tbody> innerhalb von <table> starten -->
-                        <td colspan="2">
-                          <table>
-                            <div id="answersContainer" ></div>
-                            <!-- <tbody id="answersContainer" class="answerRow"></tbody> -->
-                          </table>
-                        </td>
-                        <!-- Hier sollte </tbody> innerhalb von </table> enden -->
-                      </tr>
-                      <tr>
-                        <td><button type="button" id="addAnswerBtn">Add Answer</button></td>
-                          <td colspan="2"><button type="button" id="cancelAnswerBtn">Cancel Answer</button></td>
-                          
-                        <td><button id="submitQuestion" type="submit">Add Question</button></td>
-                        <td><button id="cancelQuestion" onclick="closeContainer('newQuestion')">cancel</button></td>
-                      </tr>
-                    </table>
-                  </form>
-                </div>
-                
-                <!-- <button onclick="closeContainer('newQuestion')">cancel</button> -->
-            </div>
-    
-            <div id="newExam" class="newContainer">
-                 <!-- Inhalt für new Exam -->
-                 <h1 style="text-align: center;">Create an Exam</h1>
-                <button onclick="closeContainer('newExam')">cancel</button>
-            </div>
+        <div id="main-content">
+            <!-- Hauptinhalt, standardmäßig auf volle Breite --> 
+            <div id="quiz-container" style="width:100%; height:100%;"></div>
+          <dialog id="dialog">
+            <h2>the questions have been successfully updated </h2>
+          </dialog>
         </div>
-        <footer>
-            <p>&copy; 2023 HSRM</p>
-        </footer>
-        
-        
-        <script src="script.js"   defer></script>
-        <script src="LayScript.js"  defer></script>
-       
+
+        <div id="newQuestion" class="newContainer">
+            <!-- Inhalt für new Question -->
+            <h1 style="text-align: center;">Add new Question</h1>
+            <div id="newQuestion" style="width: 100%; justify-content: center; margin: 20px;">
+              <form id="dataForm">
+                <table>
+                  <tr>
+                    <td><label for="questionName">Question Name:</label></td>
+                    <td><input type="text" id="questionName" name="questionName" required></td>
+                  </tr>
+                  <tr>
+                    <td><label for="questionText">Question Text:</label></td>
+                    <td><input type="text" id="questionText" name="questionText" required></td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <table>
+                        <div id="answersContainer" ></div>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><button type="button" id="addAnswerBtn">Add Answer</button></td>
+                      <td colspan="2"><button type="button" id="cancelAnswerBtn">Cancel Answer</button></td>
+                    <td><button id="submitQuestion" type="submit">Add Question</button></td>
+                    <td><button id="cancelQuestion" onclick="closeContainer('newQuestion')">cancel</button></td>
+                  </tr>
+                </table>
+              </form>
+            </div>
+          </div>
+  
+          <div id="newExam" class="newContainer">
+                <!-- Inhalt für new Exam -->
+                <h1 style="text-align: center;">Create an Exam</h1>
+              <button onclick="closeContainer('newExam')">cancel</button>
+          </div>
+      </div>
+      <footer>
+          <p>&copy; 2023 HSRM</p>
+      </footer>
+      <script src="script.js"   defer></script>
+      <script src="LayScript.js"  defer></script>
     </body>
 </html>

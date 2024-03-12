@@ -7,12 +7,12 @@ function init() {
     layout:  // Diagram has horizontal layout with wrapping
         new go.TreeLayout(
           {
-            angle: 90,
+            angle:confDiagram.layout.angle ,
             arrangement: go.TreeLayout.ArrangementHorizontal,
-            layerSpacing: 80,
-            nodeSpacing: 30,
+            layerSpacing: confDiagram.layout.layerspacing,
+            nodeSpacing: confDiagram.layout.nodeSpacing,
             layerStyle: go.TreeLayout.LayerUniform,
-            isOngoing: false
+            // isOngoing: false
           }),
     "commandHandler.archetypeGroupData": { isGroup: true, text: "Group", horiz: false },
     "undoManager.isEnabled": true
@@ -36,11 +36,11 @@ function init() {
   }
 
   function defaultColor(horiz) {  // a Binding conversion function
-    return horiz ? "rgba(255, 221, 51, 0.55) " : "rgba(51,211,229, 0.5)";
+    return horiz ? confDiagram.group.colorAns  : confDiagram.group.colorSubAns;
   }
 
   function defaultFont(horiz) {  // a Binding conversion function
-    return horiz ? "bold 20px sans-serif" : "bold 16px sans-serif";
+    return horiz ? confDiagram.group.fontAns : confDiagram.group.fontSubAns;
   }
 
   // this function is used to highlight a Group that the selection may be dropped into
@@ -90,10 +90,21 @@ function init() {
         // Link-Validierungsfunktion für das GroupTemplate
         linkValidation: function(fromnode, fromport, tonode, toport) {
           // Überprüfen, ob der Startknoten und der Endknoten unterschiedliche Vorlagen haben
-          if ((fromnode.category === "groupNode" && tonode.category === "questionNode") ||
-              (fromnode.category === "questionNode" && tonode.category === "groupNode")) {
-              return true; // Erlauben Sie nur Links zwischen groupNode und questionNode
-          }      
+          // if ((fromnode.category === "groupNode" && tonode.category === "questionNode") ||
+          //     (fromnode.category === "questionNode" && tonode.category === "groupNode")) {
+          //     if(fromnode.category === "groupNode"){
+          //       // myDiagram.model.removeLinkData({ from: fromnode.key, to: tonode.key });
+          //       myDiagram.model.addLinkData({ from: tonode.key, to: fromnode.key });
+          //     }
+          //     return true; // Erlauben Sie nur Links zwischen groupNode und questionNode
+          // }    
+          if ((fromnode.category === "groupNode" && tonode.category === "questionNode")) {
+            // myDiagram.model.addLinkData({ from: tonode.key, to: fromnode.key });
+            return true;
+          }
+          else if((fromnode.category === "questionNode" && tonode.category === "groupNode")){
+            return true;
+          }     
           return false;
         }
       })
@@ -143,8 +154,21 @@ function init() {
             )
           )
     ));
-
-     
+    // Fügen Sie einen Eventlistener hinzu, um das Drag & Drop für Gruppen mit horiz == false zu unterbinden
+    myDiagram.addDiagramListener("SelectionMoved", function(e) {
+      var diagram = e.diagram;
+      var droppedParts = e.subject; // Die per Drag & Drop abgelegten Teile
+      var numMovedNodes = droppedParts.count;
+      droppedParts.each(function(part) {
+        if (!(part instanceof go.Group) && part.data.category === "infoNode" && numMovedNodes == 1) {
+          // Unterbinden des Drag & Drop
+          e.diagram.currentTool.doCancel();
+          // Rollback der Änderungen
+          diagram.undoManager.undo();
+        }
+      });
+    });
+    
   myDiagram.nodeTemplateMap.add("infoNode",
     new go.Node("Auto",
      {
@@ -155,12 +179,12 @@ function init() {
       // dropping on a Node is the same as dropping on its containing Group, even if it's top-level
       //mouseDrop: (e, node) => finishDrop(e, node.containingGroup)
      })
-      .add(new go.Shape("RoundedRectangle", { fill: "rgba(172, 230, 0, 0.9)", stroke: "white", strokeWidth: 0.5 }))
+      .add(new go.Shape("RoundedRectangle", { fill: confDiagram.infoNode.color, stroke: "white", strokeWidth: 0.5 }))
       .add(new go.TextBlock(
       {
-        margin: 7,
+        margin:  confDiagram.infoNode.margin,
         editable: false,
-        font: "bold 13px sans-serif",
+        font:  confDiagram.infoNode.font,
         opacity: 0.90
       })
       .bind("text", "text", null, null)), // `null` as the fourth argument makes this a two-way binding
@@ -176,12 +200,12 @@ function init() {
         },
         locationSpot: go.Spot.Center
       },
-      go.GraphObject.make(go.Shape, "RoundedRectangle", { fill: "lightgreen", stroke: "black" }), 
+      go.GraphObject.make(go.Shape, "RoundedRectangle", { fill: confDiagram.questionNode.color, stroke: "black" }), 
       go.GraphObject.make(go.TextBlock, 
       { 
-        margin: 7,
+        margin: confDiagram.questionNode.margin,
         editable: false,
-        // font: "bold 13px sans-serif",
+        font: confDiagram.questionNode.font,
         opacity: 0.90 
       }, 
       new go.Binding("text", "text")),
@@ -224,13 +248,40 @@ function init() {
   myDiagram.linkTemplate =
     go.GraphObject.make(go.Link,
       {
-          routing: go.Link.Normal,
-          curve: go.Link.Bezier,
-          corner: 10,
+        routing: go.Link.Normal,
+        curve: go.Link.Bezier,
+        corner: 10,
         selectable: false
       },
-      go.GraphObject.make(go.Shape, { strokeWidth: 2, stroke: "black" })
+      go.GraphObject.make(go.Shape, { strokeWidth: confDiagram.link.strokeWidth, stroke: confDiagram.link.strokeColor })
     );
+
+  myDiagram.addDiagramListener("LinkDrawn", function(event) {
+    var link = event.subject;
+    var fromNode = link.fromNode;
+    var toNode = link.toNode;
+
+    // Überprüfen, ob der Startknoten ein "groupNode" und der Endknoten ein "questionNode" ist
+    if (fromNode.category === "groupNode" && toNode.category === "questionNode") {
+      // Ändern Sie den Link, indem Sie die Richtung umkehren
+      var newFromPort = link.toPort;
+      var newToPort = link.fromPort;
+      
+      // Ändern Sie die Linkverbindung
+      link.fromNode = toNode; 
+      link.toNode = fromNode;
+      link.fromPort = newFromPort;
+      link.toPort = newToPort;
+      
+      // Aktualisieren Sie das Diagramm, um die Änderungen anzuzeigen
+      myDiagram.commitTransaction("invertLinkDirection");
+    }
+  });
+  myDiagram.addDiagramListener("SubGraphExpanded", function (event) {
+    myDiagram.layout.isOngoing = false;
+
+  });
+  
  
   // search a question-----------------
   document.addEventListener("DOMContentLoaded", function () {
@@ -343,6 +394,29 @@ myDiagram.div.addEventListener('contextmenu', function (e) {
   showCustomContextMenu(e.pageX, e.pageY);
 });
 
+// Funktion zur Anpassung der Position des Kontextmenüs im sichtbaren Bereich
+function adjustContextMenuPosition(contextMenu) {
+  const menuWidth = contextMenu.offsetWidth;
+  const menuHeight = contextMenu.offsetHeight;
+  const windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  const windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+  let adjustedX = parseInt(contextMenu.style.left, 10);
+  let adjustedY = parseInt(contextMenu.style.top, 10);
+
+  if (adjustedX + menuWidth > windowWidth) {
+    adjustedX = windowWidth - menuWidth*1.15;
+  }
+
+  if (adjustedY + menuHeight > windowHeight) {
+    adjustedY = windowHeight - menuHeight;
+  }
+
+  // Setzen Sie die angepasste Position des Kontextmenüs
+  contextMenu.style.left = adjustedX + 'px';
+  contextMenu.style.top = adjustedY + 'px';
+}
+
 // Funktion zum Anzeigen des benutzerdefinierten Kontextmenüs
 function showCustomContextMenu(x, y) {
   // Erstellen Sie ein HTML-Element für das benutzerdefinierte Kontextmenü
@@ -350,11 +424,12 @@ function showCustomContextMenu(x, y) {
   contextMenu.style.position = 'absolute';
   contextMenu.style.left = x + 'px';
   contextMenu.style.top = y + 'px';
-  contextMenu.style.backgroundColor = '#333';
-  contextMenu.style.color = '#fff';
+  contextMenu.style.backgroundColor = confContexMenu.backgroundColor;
+  contextMenu.style.color = confContexMenu.textColor;
   contextMenu.style.border = '1px solid #ccc';
   contextMenu.style.padding = '5px';
   contextMenu.style.zIndex = '1000';
+  contextMenu.style.width = "150px";
   contextMenu.style.borderRadius = '1px'; 
   var style = document.createElement('style');
   style.textContent = `
@@ -506,77 +581,131 @@ function showCustomContextMenu(x, y) {
   editIcon.innerHTML= `<i style="margin-right:5px" class="fa fa-pen-to-square"></i>`;
   editMenuItem.style.display = 'block';
   editMenuItem.textContent = 'Edit';
-  
+
   // Dialog-Element einmalig erstellen
   var dialog = document.createElement("dialog");
   dialog.innerHTML = `
-      <h2 id="edit-dialog-heading" style="text-align: center;">Edit</h2>
-      <input type="text" id="editInput">
-      <p class="button-row">
-          <button id="confirmButton">Bestätigen</button>
-          <button id="cancelButton">Abbrechen</button>
-      </p>
+    <h2 id="edit-dialog-heading" style="text-align: center;">Edit</h2>
+    <input type="text" id="questionInput" placeholder="Question" style="display: none">
+    <input type="text" id="answerInput" placeholder="Answer" style="display: none"><br>
+    <select id="correctInput" style="display: none"> 
+      <option value="true">True</option>
+      <option value="false">False</option>
+    </select><br>
+    <input type="number" id="pointsInput" placeholder="Points" style="display: none"><br>
+    <input type="number" id="percentageInput" placeholder="Percentage" style="display: none">
+    <p class="button-row">
+      <button id="confirmButton">Bestätigen</button>
+      <button id="cancelButton">Abbrechen</button>
+    </p>
   `;
   dialog.classList.add("edit-dialog");
   document.body.appendChild(dialog);
-  
+
   editMenuItem.addEventListener('click', function(event) {
-      var selectedNode = myDiagram.selection.first();
-  
-      if (selectedNode instanceof go.Node) {
-          var data = selectedNode.data;
-  
-          if (data) {
-              var textToEdit = data.category === "infoNode" ? data.text.split(":")[1] : data.text;
-              var editInput = dialog.querySelector('#editInput');
-              editInput.value = textToEdit;
+    var selectedNode = myDiagram.selection.first();
 
-              dialog.showModal();
-  
-              var confirmButton = dialog.querySelector('#confirmButton');
-              var cancelButton = dialog.querySelector('#cancelButton');
-              
-              // Additional code for handling different input types based on category
-              var inputType = "text"; // Default input type
+    if (selectedNode instanceof go.Node) {
+      var data = selectedNode.data;
 
-              // Check if category is "infoNode" and text starts with "correct"
-              if (data.category === "infoNode" && data.text.split(":")[0].toLowerCase().includes("correct")) {
-                inputType = "select";
-                var selectElement = document.createElement("select");
-                selectElement.innerHTML = '<option value="true">True</option><option value="false">False</option>';
-                editInput.parentNode.replaceChild(selectElement, editInput);
-                editInput = selectElement;
-            }
-              // Check if category is "infoNode" and text starts with "point" or "percentage"
-              else if (data.category === "infoNode" && (data.text.split(":")[0].toLowerCase().includes("points") || data.text.split(":")[0].toLowerCase().includes("percentage"))) {
-                  inputType = "number";
-              }
+      if (data) {
+        var questionInput = dialog.querySelector('#questionInput');
+        var answerInput = dialog.querySelector('#answerInput');
+        var correctInput = dialog.querySelector('#correctInput');
+        var pointsInput = dialog.querySelector('#pointsInput');
+        var percentageInput = dialog.querySelector('#percentageInput');
 
-              editInput.setAttribute("type", inputType);
-  
-              confirmButton.addEventListener('click', function() {
-                  var editedText = editInput.value;
-                  if (data.category == "infoNode") {
-                      myDiagram.model.startTransaction("editNodeText");
-                      myDiagram.model.setDataProperty(data, "text", data.text.split(":")[0] + ": " + editedText);
-                      myDiagram.model.commitTransaction("editNodeText");
-                      dialog.close();
-                  } else {
-                      myDiagram.model.startTransaction("editNodeText");
-                      myDiagram.model.setDataProperty(data, "text", editedText);
-                      myDiagram.model.commitTransaction("editNodeText");
-                      dialog.close();
+        if (selectedNode.category === "groupNode" && selectedNode.memberParts.count == 3) {
+          // If the selected node is a groupNode and contains infoNodes
+          // Adjust the form fields accordingly
+          answerInput.style.display = 'block';
+          correctInput.style.display = 'block';
+          pointsInput.style.display = 'block';
+          percentageInput.style.display = 'block';
+
+          answerInput.value = data.text;
+        } 
+        else if (selectedNode.category === "questinoNode") {
+          questionInput.style.display = 'block';
+          questionInput.value = data.text;
+        }
+        else if (selectedNode.category === "infoNode"&& data.text.split(":")[0].toLowerCase().includes("correct")){
+          correctInput.style.display = 'block';
+        }
+        else if (selectedNode.category === "infoNode"&& data.text.split(":")[0].toLowerCase().includes("points")){
+          pointsInput.style.display = 'block';
+        }
+        else if (selectedNode.category === "infoNode"&& data.text.split(":")[0].toLowerCase().includes("percentage")){
+          pointsInput.style.display = 'block';
+        }
+        else{
+          questionInput.style.display = 'block';
+          questionInput.value = data.text;
+        }
+
+
+        dialog.showModal();
+
+        var confirmButton = dialog.querySelector('#confirmButton');
+        var cancelButton = dialog.querySelector('#cancelButton');
+
+        confirmButton.addEventListener('click', function() {
+          // Handle confirmation logic here
+          var editedQuestion = questionInput.value;
+          var editedAnswer = answerInput.value;
+          var editedCorrect = correctInput.value;
+          var editedPoint = pointsInput.value;
+          var editedPercentage = percentageInput.value;
+          myDiagram.model.startTransaction("editNodeText");
+
+          if (selectedNode.category === "groupNode" && selectedNode.memberParts.count == 3) {
+            myDiagram.model.setDataProperty(data, "text", editedAnswer);
+            selectedNode.memberParts.each(function(part) {
+              var partData = part.data;
+              if (partData.category === "infoNode") {
+                  var labelText = partData.text.split(":")[0].trim();
+                  if (labelText.toLowerCase() === "correct") {
+                    myDiagram.model.setDataProperty(partData, "text", labelText + ": " + editedCorrect);
                   }
-              });
-  
-              cancelButton.addEventListener('click', function() {
-                  dialog.close();
-              });
+                  else if(labelText.toLowerCase() === "points"){
+                    myDiagram.model.setDataProperty(partData, "text", labelText + ": " + editedPoint);
+                  }
+                  else if(labelText.toLowerCase() === "percentage"){
+                    myDiagram.model.setDataProperty(partData, "text", labelText + ": " + editedPercentage);
+                  }
+              }
+          });
+          } 
+          else if (selectedNode.category === "questinoNode") {
+            myDiagram.model.setDataProperty(data, "text", editedQuestion);
           }
+          else if (selectedNode.category === "infoNode"&& data.text.split(":")[0].toLowerCase().includes("correct")){
+            myDiagram.model.setDataProperty(data, "text", data.text.split(":")[0] + ": " + editedCorrect);
+          }
+          else if (selectedNode.category === "infoNode"&& data.text.split(":")[0].toLowerCase().includes("points")){
+            myDiagram.model.setDataProperty(data, "text", data.text.split(":")[0] + ": " + editedPoint);
+          }
+          else if (selectedNode.category === "infoNode"&& data.text.split(":")[0].toLowerCase().includes("percentage")){
+            myDiagram.model.setDataProperty(data, "text", data.text.split(":")[0] + ": " + editedPercentage);
+          }
+          else{
+            questionInput.style.display = 'block';
+            myDiagram.model.setDataProperty(data, "text", editedQuestion);
+          }
+
+          myDiagram.model.commitTransaction("editNodeText");
+          dialog.close();
+        });
+
+        cancelButton.addEventListener('click', function() {
+            dialog.close();
+        });
       }
-  
+    }
+
       contextMenu.remove();
   });
+
   editIcon.appendChild(editMenuItem)
   contextMenu.appendChild(editIcon);
 
@@ -659,14 +788,10 @@ function showCustomContextMenu(x, y) {
         // Fügen Sie hier Ihren Code für die Verwendung des "key" hinzu
       }
     }
+    // Aktualisieren Sie das Diagramm mit den aktualisierten quizData
+    myDiagram.model = go.Model.fromJson(quizData);
 
-    
-     
-     
-     // Aktualisieren Sie das Diagramm mit den aktualisierten quizData
-     myDiagram.model = go.Model.fromJson(quizData);
- 
-       contextMenu.remove();
+    contextMenu.remove();
    });
    addAnsIcon.appendChild(addAnswer);
    contextMenu.appendChild(addAnsIcon);
@@ -682,6 +807,7 @@ function showCustomContextMenu(x, y) {
       contextMenu.remove();
     }
   });
+  adjustContextMenuPosition(contextMenu); 
 }
 
 // Funktion zum Aufrufen der Server-API zum Löschen des Elements
@@ -858,18 +984,18 @@ function updateData() {
     });
 
     subNodes.forEach(subNode => {
-        const ansInfo = newQuizData.nodeDataArray.filter(node => node.group === subNode.key);
-        ansInfo.forEach(item => {
-          if (!ques.answers.find(ans => ans.text === subNode.text)) {
-            ques.answers.push({
-              "id": parseInt(subNode.id.split('#')[0]),
-              "text": subNode.text,
-              "correct": getCorrect(item.group), 
-              "points": getPoints(item.group),
-              "percentage": getPercentage(item.group)
-            });
-          }
-        });
+      const ansInfo = newQuizData.nodeDataArray.filter(node => node.group === subNode.key);
+      ansInfo.forEach(item => {
+        if (!ques.answers.find(ans => ans.text === subNode.text)) {
+          ques.answers.push({
+            "id": parseInt(subNode.id.split('#')[0]),
+            "text": subNode.text,
+            "correct": getCorrect(item.group), 
+            "points": getPoints(item.group),
+            "percentage": getPercentage(item.group)
+          });
+        }
+      });
     });
   });
   function getPoints(group) {
@@ -1058,25 +1184,25 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById('answersContainer').addEventListener('input', (event) => {
     // Prüfen, ob das Event von einem select-Element ausgelöst wurde
     if (event.target.tagName.toLowerCase() === 'select') {
-        const selectedAnswerId = parseInt(event.target.value);
+      const selectedAnswerId = parseInt(event.target.value);
 
-        if (!isNaN(selectedAnswerId)) {
-            const selectedQuestion = data.questions.find(question => 
-                question.answers.some(answer => answer.id === selectedAnswerId)
-            );
+      if (!isNaN(selectedAnswerId)) {
+          const selectedQuestion = data.questions.find(question => 
+              question.answers.some(answer => answer.id === selectedAnswerId)
+          );
 
-            if (selectedQuestion) {
-                const selectedAnswer = selectedQuestion.answers.find(answer => answer.id === selectedAnswerId);
+          if (selectedQuestion) {
+              const selectedAnswer = selectedQuestion.answers.find(answer => answer.id === selectedAnswerId);
 
-                const answerRow = event.target.closest('.answerRow');
-                if (answerRow) {
-                    answerRow.querySelector('.ansText').value = selectedAnswer.text;
-                    answerRow.querySelector('.ansPoints').value = selectedAnswer.points;
-                    answerRow.querySelector('.ansCorrect').checked = selectedAnswer.correct;
-                    answerRow.querySelector('.ansPercentage').value = selectedAnswer.percentage;
-                }
-            }
-        }
+              const answerRow = event.target.closest('.answerRow');
+              if (answerRow) {
+                  answerRow.querySelector('.ansText').value = selectedAnswer.text;
+                  answerRow.querySelector('.ansPoints').value = selectedAnswer.points;
+                  answerRow.querySelector('.ansCorrect').checked = selectedAnswer.correct;
+                  answerRow.querySelector('.ansPercentage').value = selectedAnswer.percentage;
+              }
+          }
+      }
     }
   });
   document.getElementById("dataForm").addEventListener("submit", submitForm);

@@ -59,11 +59,12 @@ header {
 .newContainer {
     flex: 0;
     display: none;
-    height: 100vh;
+    height: calc(100vh - 160px);
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     transition: all 0.3s ease; /* Animation für die Breitenänderung */
+    padding-top: 100px;
 }
 
 
@@ -123,7 +124,6 @@ footer {
 
 
 }
-
 
 .iconContextMenu{
     display: flex;
